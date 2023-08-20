@@ -167,6 +167,7 @@ def send_meters_management_line_notify(data:list)->None:
     [供電方式:{i['供電方式']}]
     """
         msg = msg + line
+    print("傳送水錶頁面至LINE")
     send_line_notify(msg)
 
 def send_meter_history_line_notify(meter:str, data:list)->None:
@@ -187,6 +188,7 @@ def send_meter_history_line_notify(meter:str, data:list)->None:
     [每度水(元):{bill_per_cm}]
     [金額(元):{bill_total}]
     """
+    print(f"傳送水錶 {meter} 歷史記錄至LINE")
     send_line_notify(msg)
 
 def main():
