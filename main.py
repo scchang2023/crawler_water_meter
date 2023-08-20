@@ -86,6 +86,7 @@ def get_meters_management(dr:webdriver)->list:
     return data
 
 def save_meters_management_csv(data:list)->None:
+    print("儲存水錶管理頁面")
     date = get_cur_date()
     filename = f"{date}-目前水錶管理.csv"    
     with open(filename, mode='w', encoding='utf-8', newline='') as file:
@@ -130,7 +131,7 @@ def save_meter_history_csv(meter:str, data:list)->None:
     usage = 0.0
     for i in data:
         usage += float(i['使用水量'])
-    bill_total = int(bill_per_cm * usage)
+    bill_total = round(bill_per_cm * usage)
     usage_str = "%.1f"%usage
     with open(filename, mode='a', encoding='utf-8', newline='') as file:
         file.writelines(f"""總使用總水量(度),{usage_str}
@@ -151,7 +152,7 @@ def send_line_notify(msg:str)->None:
         'message': msg # 設定要發送的訊息
     }
     r = requests.post(url, headers=headers, params=params) # 使用 post 方法
-    print(r.status_code)
+    # print(r.status_code)
     return r
 
 def send_meters_management_line_notify(data:list)->None:
@@ -167,14 +168,14 @@ def send_meters_management_line_notify(data:list)->None:
     [供電方式:{i['供電方式']}]
     """
         msg = msg + line
-    print("傳送水錶頁面至LINE")
+    print("傳送水錶管理頁面至LINE")
     send_line_notify(msg)
 
 def send_meter_history_line_notify(meter:str, data:list)->None:
     usage = 0.0
     for i in data:
         usage += float(i['使用水量'])
-    bill_total = int(bill_per_cm * usage)
+    bill_total = round(bill_per_cm * usage)
     usage_str ="%.1f"%usage
     msg:str=f"""
     [用水歷史記錄]
@@ -197,10 +198,12 @@ def main():
     meters_management = get_meters_management(driver)
     send_meters_management_line_notify(meters_management)
     save_meters_management_csv(meters_management)
+    print("\n")
     for i in meters_management:
         meter_history = get_meter_history(driver, i["水錶號碼"])
         send_meter_history_line_notify(i["水錶名稱"],meter_history)
         save_meter_history_csv(i["水錶名稱"], meter_history)
+        print("\n")
     close_chrome_driver(driver)
 
 if __name__ == "__main__":
