@@ -27,7 +27,7 @@ def create_chrome_driver()->webdriver:
     # unzip chromedriver_linux64.zip
     # sudo mv chromedriver /usr/local/bin/ 安裝 chromedriver
     # chromedriver --version 查是否成功安裝 chromedriver
-    # options.chrome_executable_path="/usr/local/bin/chromedriver"
+    # options.chrome_executable_path="./chromedriver-linux64/chromedriver"
     # print(options.chrome_executable_path)
     # 建立 driver 物件實體
     return webdriver.Chrome(options=options)
