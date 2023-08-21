@@ -133,7 +133,7 @@ def save_meter_history_csv(meter:str, data:list, usage:float, price_pcm: int)->N
 def send_line_notify(msg:str)->requests.Response:
     url = 'https://notify-api.line.me/api/notify'
     # 個人測試
-    token = 'pbgUOOVbAa9HgFWJRixB6zIdrOEvK7KQ2FWeoZGZTiJ'
+    token = 'pOg4hhT4g6UJmg819HjGqD554BAzlq2cqE8XL97kogL'
     headers = {
         'Authorization': 'Bearer ' + token, # 設定權杖
     }
