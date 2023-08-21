@@ -8,23 +8,12 @@ import time
 # 存成 csv 檔
 import csv
 # 取得目前時間模組
-from datetime import datetime
-# 取得時區
-import pytz
+import datetime
 # 系統路徑
 import os
 import requests
 
-bill_per_cm = 17
-
-def get_cur_date()->str:
-    '''
-    - 取得台灣目前year-month-day
-    '''
-    taiwan_timezone = pytz.timezone('Asia/Taipei')
-    current_date = datetime.now(taiwan_timezone)    
-    date = f"{current_date.year}-{current_date.month}-{current_date.day}"
-    return date
+PRICE_PCM = 17
 
 def create_chrome_driver()->webdriver:
     options = Options()
@@ -41,8 +30,7 @@ def create_chrome_driver()->webdriver:
     # options.chrome_executable_path="/usr/local/bin/chromedriver"
     # print(options.chrome_executable_path)
     # 建立 driver 物件實體
-    driver=webdriver.Chrome(options=options)
-    return driver
+    return webdriver.Chrome(options=options)
 
 def close_chrome_driver(dr:webdriver)->None:
     dr.close()
@@ -66,6 +54,7 @@ def get_meters_management(dr:webdriver)->list:
     time.sleep(3)
     print("取得水錶管理")
     meter_element = dr.find_element(By.ID, "table1")
+    time.sleep(3)
     # print(meter_element.text)
     meter_element_list = meter_element.text.splitlines()
     meter_element_list = meter_element_list[9:]
@@ -80,22 +69,24 @@ def get_meters_management(dr:webdriver)->list:
         meter_item['總水量'] = i[5]
         meter_item['狀態'] = i[6]
         meter_item['供電方式'] = i[7]
-        # print(meter_item)
         data.append(meter_item)
     print(data)
     return data
 
 def save_meters_management_csv(data:list)->None:
     print("儲存水錶管理頁面")
-    date = get_cur_date()
-    filename = f"{date}-目前水錶管理.csv"    
+    # current_time = datetime.datetime.now()
+    # print(current_time)
+    current_date = datetime.date.today()
+    # print(current_date)    
+    filename = f"目前水錶管理-{current_date}.csv"    
     with open(filename, mode='w', encoding='utf-8', newline='') as file:
         fieldnames = ['水錶名稱','水錶號碼', '總水量','狀態','供電方式']
         writer = csv.DictWriter(file, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(data)
 
-def get_meter_history(dr:webdriver, meter:str)->(list):
+def get_meter_history(dr:webdriver, meter:str)->(list, float):
     print(f"連線至水錶 {meter} 歷史記錄頁面")
     url = f"http://www.cnyiot.com/MMpublicHis.aspx?ID={meter}"
     dr.get(url)
@@ -105,7 +96,8 @@ def get_meter_history(dr:webdriver, meter:str)->(list):
     # print(meter_element.text)
     meter_element_list:list = meter_element.text.splitlines()
     meter_element_list = meter_element_list[7:]
-    data:list = []
+    data = []
+    usage = 0.0
     for i in meter_element_list:
         meter_item={}
         i = i.replace("查看详情","")
@@ -115,30 +107,29 @@ def get_meter_history(dr:webdriver, meter:str)->(list):
         meter_item['開始總水量'] = i[5]
         meter_item['結束總水量'] = i[6]
         meter_item['使用水量'] = i[8]
+        usage += float(i[8])
         data.append(meter_item)
     print(data)
-    return data
+    return data, usage
 
-def save_meter_history_csv(meter:str, data:list)->None:
+def save_meter_history_csv(meter:str, data:list, usage:float, price_pcm: int)->None:
     print(f"儲存水錶 {meter} 歷史記錄")
-    date = get_cur_date()
-    filename = f"{date}-{meter}.csv"
+    current_date = datetime.date.today()
+    filename = f"{meter}-{current_date}.csv"
     with open(filename, mode='w', encoding='utf-8', newline='') as file:
         fieldnames = ['開始時間', '結束時間','開始總水量', '結束總水量', '使用水量']
         writer = csv.DictWriter(file, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(data)
-    usage = 0.0
-    for i in data:
-        usage += float(i['使用水量'])
-    bill_total = round(bill_per_cm * usage)
+    
+    bill = round(price_pcm * usage)
     usage_str = "%.1f"%usage
     with open(filename, mode='a', encoding='utf-8', newline='') as file:
-        file.writelines(f"""總使用總水量(度),{usage_str}
-每度水(元),{bill_per_cm}
-金額(元),{bill_total}""")
+        file.writelines(f"""使用總水量(度),{usage_str}
+每度水(元),{price_pcm}
+金額(元),{bill}""")
 
-def send_line_notify(msg:str)->None:
+def send_line_notify(msg:str)->requests.Response:
     url = 'https://notify-api.line.me/api/notify'
     # 個人測試
     token = 'pbgUOOVbAa9HgFWJRixB6zIdrOEvK7KQ2FWeoZGZTiJ'
@@ -151,13 +142,11 @@ def send_line_notify(msg:str)->None:
     params = {
         'message': msg # 設定要發送的訊息
     }
-    r = requests.post(url, headers=headers, params=params) # 使用 post 方法
-    # print(r.status_code)
-    return r
+    return requests.post(url, headers=headers, params=params) # 使用 post 方法
 
-def send_meters_management_line_notify(data:list)->None:
+def send_meters_management_line_notify(data:list)->requests.Response:
     msg:str="""
-    [水錶管理頁面]
+    [目前水錶管理]
     """
     for i in data:
         line:str = f"""
@@ -169,28 +158,43 @@ def send_meters_management_line_notify(data:list)->None:
     """
         msg = msg + line
     print("傳送水錶管理頁面至 LINE Notify")
-    send_line_notify(msg)
+    return send_line_notify(msg)
 
-def send_meter_history_line_notify(meter:str, data:list)->None:
+def send_meter_history_line_notify(meter:str, data:list, usage:float, price_pcm:int)->requests.Response:
     usage = 0.0
     for i in data:
         usage += float(i['使用水量'])
-    bill_total = round(bill_per_cm * usage)
+    bill = round(price_pcm * usage)
     usage_str ="%.1f"%usage
+    current_date = str(datetime.date.today())
+    current_month = current_date[:7]
+    if(meter =='1F前面水錶' or meter =='2F前面水錶'):
+        tenant = "21世紀"
+    else:
+        tenant = "G12汽車"
     msg:str=f"""
-    [用水歷史記錄]
-
-    [{meter}]
+    [{meter}-{tenant}]
+    [用水月份:{current_month}]
     [開始時間:{data[-1]['開始時間']}]
     [結束時間:{data[0]['結束時間']}]
     [開始總水量(度):{data[-1]['開始總水量']}]
     [結束總水量(度):{data[0]['結束總水量']}]
     [總使用水量(度):{usage_str}]
-    [每度水(元):{bill_per_cm}]
-    [金額(元):{bill_total}]
+    [每度水(元):{price_pcm}]
+    [金額(元):{bill}]
     """
     print(f"傳送水錶 {meter} 歷史記錄至LINE")
-    send_line_notify(msg)
+    return send_line_notify(msg)
+
+def send_bill_total_line_notify(name:str, bill:int)->requests.Response:
+    current_date = str(datetime.date.today())
+    current_month = current_date[:7]
+    msg:str=f"""
+    [{name}]
+    [用水月份:{current_month}]
+    [總金額(元):{bill}]
+    """
+    return send_line_notify(msg)
 
 def main():
     driver = create_chrome_driver()
@@ -199,12 +203,20 @@ def main():
     send_meters_management_line_notify(meters_management)
     save_meters_management_csv(meters_management)
     print("\n")
+    bill_G12, bill_21Century = 0, 0
     for i in meters_management:
-        meter_history = get_meter_history(driver, i["水錶號碼"])
-        send_meter_history_line_notify(i["水錶名稱"],meter_history)
-        save_meter_history_csv(i["水錶名稱"], meter_history)
+        meter_history, usage = get_meter_history(driver, i["水錶號碼"])
+        send_meter_history_line_notify(i["水錶名稱"],meter_history, usage, PRICE_PCM)
+        save_meter_history_csv(i["水錶名稱"], meter_history, usage, PRICE_PCM)
         print("\n")
+        if(i["水錶名稱"]=='1F前面水錶' or i["水錶名稱"]=='2F前面水錶'):
+            bill_21Century += round(usage*PRICE_PCM)
+        else:
+            bill_G12 += round(usage*PRICE_PCM)
     close_chrome_driver(driver)
+    send_bill_total_line_notify("G12汽車", bill_G12)
+    time.sleep(3)
+    send_bill_total_line_notify("21世紀", bill_21Century)
 
 if __name__ == "__main__":
     main()
