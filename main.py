@@ -16,10 +16,13 @@ import requests
 PRICE_PCM = 17
 
 def create_chrome_driver()->webdriver:
+    options = Options()
     options.add_argument("--headless")
+    
     # for windows
     current_cwd = os.path.abspath(os.getcwd())
     options.chrome_executable_path=f"{current_cwd}\chromedriver-win64\chromedriver.exe"
+
     # for linux
     # unzip chromedriver_linux64.zip
     # sudo mv chromedriver /usr/local/bin/ 安裝 chromedriver
@@ -32,14 +35,13 @@ def create_chrome_driver()->webdriver:
 def close_chrome_driver(dr:webdriver)->None:
     dr.close()
 
-    options = Options()
 def login_meters_page(dr:webdriver)->None:
     print("連線至水錶登入頁面")
     dr.get("http://www.cnyiot.com/MLogin.aspx")
     time.sleep(3)
+    print("自動輸入帳密並登入")
     username_input = dr.find_element(By.ID, "username")
     password_input = dr.find_element(By.ID, "password")
-    print("自動輸入帳密並登入")
     username_input.send_keys("00011049")
     password_input.send_keys("14725818")
     btn_singin = dr.find_element(By.ID, "subBt")
