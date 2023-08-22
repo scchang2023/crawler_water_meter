@@ -1,15 +1,15 @@
-# 載入 selenium 相關模組
+# import selenium module
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 # delay
 import time
-# 存成 csv 檔
+# save to csv file
 import csv
-# 取得目前時間模組
+# get date time module
 import datetime
-# 系統路徑
+# system path
 import os
 import requests
 
