@@ -32,10 +32,10 @@ def create_chrome_driver():
     # create driver instance
     return webdriver.Chrome(options=options)
 
-def close_chrome_driver(dr)->None:
+def close_chrome_driver(dr):
     dr.close()
 
-def login_meters_page(dr)->None:
+def login_meters_page(dr):
     print("連線至水錶登入頁面")
     dr.get("http://www.cnyiot.com/MLogin.aspx")
     time.sleep(3)
