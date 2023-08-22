@@ -15,7 +15,7 @@ import requests
 
 PRICE_PCM = 17
 
-def create_chrome_driver()->webdriver:
+def create_chrome_driver():
     options = Options()
     options.add_argument("--headless")
     
