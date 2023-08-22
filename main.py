@@ -15,7 +15,7 @@ import requests
 
 PRICE_PCM = 17
 
-def create_chrome_driver():
+def create_chrome_driver()->webdriver:
     options = Options()
     options.add_argument("--headless")
     
@@ -25,17 +25,17 @@ def create_chrome_driver():
 
     # for linux
     # unzip chromedriver_linux64.zip
-    # sudo mv chromedriver /usr/local/bin/ install chromedriver
-    # chromedriver --version
+    # sudo mv chromedriver /usr/local/bin/ 安裝 chromedriver
+    # chromedriver --version 查是否成功安裝 chromedriver
     options.chrome_executable_path="./chromedriver-linux64/chromedriver"
     # print(options.chrome_executable_path)
-    # create driver instance
+    # 建立 driver 物件實體
     return webdriver.Chrome(options=options)
 
-def close_chrome_driver(dr):
+def close_chrome_driver(dr:webdriver)->None:
     dr.close()
 
-def login_meters_page(dr):
+def login_meters_page(dr:webdriver)->None:
     print("連線至水錶登入頁面")
     dr.get("http://www.cnyiot.com/MLogin.aspx")
     time.sleep(3)
