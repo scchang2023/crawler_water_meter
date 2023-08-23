@@ -1,12 +1,10 @@
-# import selenium module
+# 載入 selenium 相關模組
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
-# from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.firefox.options import Options
 # delay
 import time
-# save to csv file
 import csv
 # get date time module
 import datetime
@@ -14,6 +12,7 @@ import datetime
 import os
 import requests
 
+# 每度水多少錢
 PRICE_PCM = 17
 
 def create_chrome_driver()->webdriver:
@@ -28,13 +27,10 @@ def create_chrome_driver()->webdriver:
     # unzip chromedriver_linux64.zip
     # sudo mv chromedriver /usr/local/bin/ 安裝 chromedriver
     # chromedriver --version 查是否成功安裝 chromedriver
-    # options.chrome_executable_path=f"{current_cwd}/chromedriver-linux64/chromedriver"
-    # print(options.chrome_executable_path)
-    options.executable_path =f"/volume1/py_env/bin/geckodriver"
-    print(options.executable_path)    
+    options.chrome_executable_path=f"{current_cwd}/chromedriver-linux64/chromedriver"
+    print(f"目前 chromedriver 路徑: {options.chrome_executable_path}") 
     # 建立 driver 物件實體
-    # return webdriver.Chrome(options=options)
-    return webdriver.Firefox(options=options)
+    return webdriver.Chrome(options=options)
 
 def close_chrome_driver(dr:webdriver)->None:
     dr.close()
