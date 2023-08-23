@@ -81,8 +81,7 @@ def get_cur_taiwan_date()->str:
     '''
     taiwan_timezone = pytz.timezone('Asia/Taipei')
     current_date = datetime.now(taiwan_timezone)    
-    date = f"{current_date.year}-{current_date.month}-{current_date.day}"
-    date = "%4d-%02d-%2d"%current_date.year%current_date.month%current_date.day
+    date = "%4d-%02d-%2d" %(current_date.year, current_date.month, current_date.day)
     return date
 
 def save_meters_management_csv(data:list)->None:
