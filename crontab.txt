@@ -1,0 +1,4 @@
+# 每分鐘執行一次
+*/1 * * * * /bin/python3 /home/a0928136004/work/crawler_water_meter/main.py
+# 每天早上 8 點 30 分執行
+30 17 * * * /bin/python3 /home/a0928136004/work/crawler_water_meter/main.py
