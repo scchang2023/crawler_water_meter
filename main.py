@@ -7,7 +7,9 @@ from selenium.webdriver.chrome.options import Options
 import time
 import csv
 # get date time module
-import datetime
+from datetime import datetime
+# 取得時區
+import pytz
 # system path
 import os
 import requests
@@ -19,15 +21,15 @@ PRICE_PCM = 17
 def create_chrome_driver()->webdriver:
     options = Options()
     options.add_argument("--headless")
-    
     current_cwd = os.path.abspath(os.getcwd())
     # for windows
-    # options.chrome_executable_path=f"{current_cwd}\chromedriver-win64\chromedriver.exe"
-
     # for linux
     # sudo apt install chromium
     # chromium --version 檢查是否安裝成功
-    options.chrome_executable_path=f"{current_cwd}/chromedriver-linux64/chromedriver"
+    if os.name == 'nt':
+        options.chrome_executable_path=f"{current_cwd}\chromedriver-win64\chromedriver.exe"
+    else:
+        options.chrome_executable_path=f"{current_cwd}/chromedriver-linux64/chromedriver"
     print(f"目前 chromedriver 路徑: {options.chrome_executable_path}") 
     # 建立 driver 物件實體
     return webdriver.Chrome(options=options)
@@ -73,13 +75,24 @@ def get_meters_management(dr:webdriver)->list:
     print(data)
     return data
 
+def get_cur_taiwan_date()->str:
+    '''
+    - 取得台灣目前year-month-day
+    '''
+    taiwan_timezone = pytz.timezone('Asia/Taipei')
+    current_date = datetime.now(taiwan_timezone)    
+    date = f"{current_date.year}-{current_date.month}-{current_date.day}"
+    return date
+
 def save_meters_management_csv(data:list)->None:
     print("儲存水錶管理頁面")
-    # current_time = datetime.datetime.now()
-    # print(current_time)
-    current_date = datetime.date.today()
-    # print(current_date)    
-    filename = f"目前水錶管理-{current_date}.csv"    
+    current_date = get_cur_taiwan_date()
+    current_cwd = os.path.abspath(os.getcwd())
+    if os.name == 'nt':
+        filename = f"{current_cwd}\data\目前水錶管理-{current_date}.csv"    
+    else:
+        filename = f"{current_cwd}/data/目前水錶管理-{current_date}.csv" 
+
     with open(filename, mode='w', encoding='utf-8', newline='') as file:
         fieldnames = ['水錶名稱','水錶號碼', '總水量','狀態','供電方式']
         writer = csv.DictWriter(file, fieldnames=fieldnames)
@@ -114,8 +127,12 @@ def get_meter_history(dr:webdriver, meter:str)->(list, float):
 
 def save_meter_history_csv(meter:str, data:list, usage:float, price_pcm: int)->None:
     print(f"儲存水錶 {meter} 歷史記錄")
-    current_date = datetime.date.today()
-    filename = f"{meter}-{current_date}.csv"
+    current_date = get_cur_taiwan_date()
+    current_cwd = os.path.abspath(os.getcwd())
+    if os.name == 'nt':
+        filename = f"{current_cwd}\data\{meter}-{current_date}.csv"
+    else:
+        filename = f"{current_cwd}/data/{meter}-{current_date}.csv"
     with open(filename, mode='w', encoding='utf-8', newline='') as file:
         fieldnames = ['開始時間', '結束時間','開始總水量', '結束總水量', '使用水量']
         writer = csv.DictWriter(file, fieldnames=fieldnames)
@@ -165,7 +182,7 @@ def send_meter_history_line_notify(meter:str, data:list, usage:float, price_pcm:
     bill = price_pcm * usage
     bill_str = "%.1f"%bill
     usage_str ="%.1f"%usage
-    current_date = str(datetime.date.today())
+    current_date = get_cur_taiwan_date()
     current_month = current_date[:7]
     if(meter =='1F前面水錶' or meter =='2F前面水錶'):
         tenant = "21世紀"
@@ -185,7 +202,7 @@ def send_meter_history_line_notify(meter:str, data:list, usage:float, price_pcm:
     return send_line_notify(msg)
 
 def send_bill_total_line_notify(name:str, bill:int)->requests.Response:
-    current_date = str(datetime.date.today())
+    current_date = get_cur_taiwan_date()
     current_month = current_date[:7]
     msg:str=f"""
     [{name}]
