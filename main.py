@@ -14,7 +14,8 @@ import requests
 
 # 每度水多少錢
 PRICE_PCM = 17
-
+# chromedriver 去這下載
+# https://googlechromelabs.github.io/chrome-for-testing/
 def create_chrome_driver()->webdriver:
     options = Options()
     options.add_argument("--headless")
