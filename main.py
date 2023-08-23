@@ -27,6 +27,7 @@ def create_chrome_driver()->webdriver:
     # unzip chromedriver_linux64.zip
     # sudo mv chromedriver /usr/local/bin/ 安裝 chromedriver
     # chromedriver --version 查是否成功安裝 chromedriver
+    os.chmod("chromedriver-linux64/chromedriver", 0o775)
     options.chrome_executable_path=f"{current_cwd}/chromedriver-linux64/chromedriver"
     print(f"目前 chromedriver 路徑: {options.chrome_executable_path}") 
     # 建立 driver 物件實體
