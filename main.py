@@ -21,13 +21,13 @@ def create_chrome_driver()->webdriver:
     
     current_cwd = os.path.abspath(os.getcwd())
     # for windows
-    options.chrome_executable_path=f"{current_cwd}\chromedriver-win64\chromedriver.exe"
+    # options.chrome_executable_path=f"{current_cwd}\chromedriver-win64\chromedriver.exe"
 
     # for linux
     # unzip chromedriver_linux64.zip
     # sudo mv chromedriver /usr/local/bin/ 安裝 chromedriver
     # chromedriver --version 查是否成功安裝 chromedriver
-    # options.chrome_executable_path=f"{current_cwd}/chromedriver-linux64/chromedriver"
+    options.chrome_executable_path=f"{current_cwd}/chromedriver-linux64/chromedriver"
     print(f"目前 chromedriver 路徑: {options.chrome_executable_path}") 
     # 建立 driver 物件實體
     return webdriver.Chrome(options=options)
