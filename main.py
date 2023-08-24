@@ -1,13 +1,7 @@
 # ====== use with chrome and selenium 4 ===
-# from selenium import webdriver
-# from selenium.webdriver.chrome.service import Service as ChromeService
-# from webdriver_manager.chrome import ChromeDriverManager
-# =========================================
-
-# ====== use with Chromium and selenium 4 ===
 from selenium import webdriver
-from selenium.webdriver.firefox.service import Service as FirefoxService
-from webdriver_manager.firefox import GeckoDriverManager
+from selenium.webdriver.chrome.service import Service as ChromeService
+from webdriver_manager.chrome import ChromeDriverManager
 # =========================================
 
 from selenium.webdriver.common.keys import Keys
@@ -32,9 +26,7 @@ def create_chrome_driver()->webdriver:
     options = Options()
     options.add_argument("--headless")
     # use with chrome
-    # return webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager().install()))
-    # use with chromium
-    return webdriver.Firefox(options=options, service=FirefoxService(GeckoDriverManager().install()))
+    return webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager().install()))
 
 def close_chrome_driver(dr:webdriver)->None:
     dr.close()
