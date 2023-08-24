@@ -1,7 +1,16 @@
-# 載入 selenium 相關模組
+# ====== use with chrome and selenium 4 ===
+# from selenium import webdriver
+# from selenium.webdriver.chrome.service import Service as ChromeService
+# from webdriver_manager.chrome import ChromeDriverManager
+# =========================================
+
+# ====== use with Chromium and selenium 4 ===
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.chrome.service import Service as ChromiumService
 from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.core.utils import ChromeType
+# =========================================
+
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
@@ -23,7 +32,10 @@ PRICE_PCM = 17
 def create_chrome_driver()->webdriver:
     options = Options()
     options.add_argument("--headless")
-    return webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager().install()))
+    # use with chrome
+    # return webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager().install()))
+    # use with chromium
+    return webdriver.Chrome(service=ChromiumService(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()))
 
 def close_chrome_driver(dr:webdriver)->None:
     dr.close()
