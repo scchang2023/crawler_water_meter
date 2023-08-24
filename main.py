@@ -1,8 +1,8 @@
 # 載入 selenium 相關模組
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service as ChromiumService
-from webdriver_manager.chrome import ChromeDriverManager
-from webdriver_manager.core.utils import ChromeType
+# from selenium.webdriver.chrome.service import Service as ChromiumService
+# from webdriver_manager.chrome import ChromeDriverManager
+# from webdriver_manager.core.utils import ChromeType
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
@@ -36,7 +36,7 @@ def create_chrome_driver()->webdriver:
     # print(f"目前 chromedriver 路徑: {options.chrome_executable_path}") 
     # 建立 driver 物件實體
     # return webdriver.Chrome(options=options)
-    return webdriver.Chrome(service=ChromiumService(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()))
+    return webdriver.Chrome(options=options)
 
 def close_chrome_driver(dr:webdriver)->None:
     dr.close()
