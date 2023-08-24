@@ -6,9 +6,8 @@
 
 # ====== use with Chromium and selenium 4 ===
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service as ChromiumService
-from webdriver_manager.chrome import ChromeDriverManager
-from webdriver_manager.core.utils import ChromeType
+from selenium.webdriver.firefox.service import Service as FirefoxService
+from webdriver_manager.firefox import GeckoDriverManager
 # =========================================
 
 from selenium.webdriver.common.keys import Keys
@@ -35,7 +34,7 @@ def create_chrome_driver()->webdriver:
     # use with chrome
     # return webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager().install()))
     # use with chromium
-    return webdriver.Chrome(service=ChromiumService(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()))
+    return webdriver.Firefox(options=options, service=FirefoxService(GeckoDriverManager().install()))
 
 def close_chrome_driver(dr:webdriver)->None:
     dr.close()
