@@ -21,15 +21,16 @@ import requests
 
 USER_NAME = '00011049'
 USER_PASSWORD = '14725818'
-# 每度水多少錢
-PRICE_PCM = 17
+PRICE_PCM = 17 # 每度水多少錢
+
 # chromedriver 去這下載
 # https://googlechromelabs.github.io/chrome-for-testing/
 def create_chrome_driver()->webdriver:
     options = Options()
     options.add_argument("--headless")
     # use with chrome
-    return webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager().install()))
+    dr = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager().install()))
+    return dr
 
 def close_chrome_driver(dr:webdriver)->None:
     dr.close()
@@ -225,10 +226,11 @@ def main():
             bill_21Century += (usage*PRICE_PCM)
         else:
             bill_G12 += (usage*PRICE_PCM)
-    close_chrome_driver(driver)
+    
     send_bill_total_line_notify("G12汽車", round(bill_G12))
     time.sleep(3)
     send_bill_total_line_notify("21世紀", round(bill_21Century))
+    close_chrome_driver(driver)
 
 if __name__ == "__main__":
     main()
