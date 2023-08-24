@@ -1,8 +1,7 @@
 # 載入 selenium 相關模組
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service as BraveService
+from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
-from webdriver_manager.core.utils import ChromeType
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
@@ -24,19 +23,7 @@ PRICE_PCM = 17
 def create_chrome_driver()->webdriver:
     options = Options()
     options.add_argument("--headless")
-    # current_cwd = os.path.abspath(os.getcwd())
-    # for windows
-    # for linux
-    # sudo apt install chromium
-    # chromium --version 檢查是否安裝成功
-    # if os.name == 'nt':
-    #    options.chrome_executable_path=f"{current_cwd}\chromedriver-win64\chromedriver.exe"
-    # else:
-    #    options.chrome_executable_path=f"{current_cwd}/chromedriver-linux64/chromedriver"
-    # print(f"目前 chromedriver 路徑: {options.chrome_executable_path}") 
-    # 建立 driver 物件實體
-    # return webdriver.Chrome(options=options)
-    return webdriver.Chrome(service=BraveService(ChromeDriverManager(chrome_type=ChromeType.BRAVE).install()))
+    return webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager().install()))
 
 def close_chrome_driver(dr:webdriver)->None:
     dr.close()
