@@ -1,4 +1,5 @@
 # ====== use with chrome and selenium 4 ===
+# 參考 https://pypi.org/project/webdriver-manager/
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
@@ -18,6 +19,8 @@ import pytz
 import os
 import requests
 
+USER_NAME = '00011049'
+USER_PASSWORD = '14725818'
 # 每度水多少錢
 PRICE_PCM = 17
 # chromedriver 去這下載
@@ -38,8 +41,8 @@ def login_meters_page(dr:webdriver)->None:
     print("自動輸入帳密並登入")
     username_input = dr.find_element(By.ID, "username")
     password_input = dr.find_element(By.ID, "password")
-    username_input.send_keys("00011049")
-    password_input.send_keys("14725818")
+    username_input.send_keys(USER_NAME)
+    password_input.send_keys(USER_PASSWORD)
     btn_singin = dr.find_element(By.ID, "subBt")
     btn_singin.send_keys(Keys.ENTER)
     time.sleep(3)

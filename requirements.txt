@@ -1,3 +1,4 @@
 selenium
 pytz
 requests
+webdriver_manager
